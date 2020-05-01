@@ -9,6 +9,7 @@ import 'package:latlong/latlong.dart' hide Path; // conflict with Path from UI
 class PolygonLayerOptions extends LayerOptions {
   final List<Polygon> polygons;
   final bool polygonCulling;
+  final Function onPolygonTap = (Polygon p) { print('Clicked polygon with id: `$p.id`'); };
 
   /// screen space culling of polygons based on bounding box
   PolygonLayerOptions(
@@ -17,6 +18,7 @@ class PolygonLayerOptions extends LayerOptions {
 }
 
 class Polygon {
+  final String id;
   final List<LatLng> points;
   final List<Offset> offsets = [];
   final List<List<LatLng>> holePointsList;
@@ -29,6 +31,7 @@ class Polygon {
   LatLngBounds boundingBox;
 
   Polygon({
+    this.id,
     this.points,
     this.holePointsList,
     this.color = const Color(0xFF00FF00),
@@ -91,12 +94,15 @@ class PolygonLayer extends StatelessWidget {
             }
           }
 
-          polygons.add(
-            CustomPaint(
+          polygons.add(GestureDetector(
+            onTap: () {
+              polygonOpts.onPolygonTap(polygon);
+            },
+            child: CustomPaint(
               painter: PolygonPainter(polygon),
               size: size,
             ),
-          );
+          ));
         }
 
         return Container(
